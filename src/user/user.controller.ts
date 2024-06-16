@@ -1,42 +1,26 @@
 import {
   Body,
   Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
   Post,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
-@Controller('user')
+@Controller('user') // Декоратор, определяющий, что этот класс является контроллером, который будет обрабатывать запросы по пути '/user'
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {} // Конструктор, в который внедряется UserService для работы с пользователями
 
-  @Post()
+  @Post() // Декоратор, указывающий, что этот метод будет обрабатывать POST-запросы
+  @UsePipes(new ValidationPipe()) // Декоратор для применения ValidationPipe к этому методу, чтобы валидировать данные перед их обработкой
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    // Декоратор Body извлекает тело запроса и автоматически маппит его на объект CreateUserDto
+    return this.userService.create(createUserDto); // Вызов метода create сервиса UserService для создания нового пользователя
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
-  }
+  // @Get()
+  // findOne() {
+  //   return this.userService.findOne();
+  // }
 }
