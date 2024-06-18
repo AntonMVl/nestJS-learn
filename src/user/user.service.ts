@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2'; // Импорт библиотеки argon2 для хеширования паролей
 import { Repository } from 'typeorm';
@@ -9,6 +10,7 @@ import { User } from './entities/user.entity';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>, // Внедрение репозитория User через конструктор
+    private readonly jwtService: JwtService,
   ) {}
 
   // Асинхронный метод для создания нового пользователя
@@ -27,8 +29,10 @@ export class UserService {
       password: await argon2.hash(createUserDto.password), // Хеширование пароля с использованием argon2
     });
 
+    const token = this.jwtService.sign({ email: createUserDto.email });
+
     // Возврат созданного пользователя
-    return { user };
+    return { user, token };
   }
 
   async findOne(email: string) {
