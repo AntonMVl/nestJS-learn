@@ -53,6 +53,7 @@ export class CategoryService {
       where: { id },
       relations: {
         user: true,
+        transactions: true,
       },
     });
 
@@ -61,11 +62,22 @@ export class CategoryService {
     return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+
+    if (!category) throw new NotFoundException('This category is not found');
+    return await this.categoryRepository.update(id, updateCategoryDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number) {
+    const category = await this.categoryRepository.findOne({
+      where: { id },
+    });
+
+    if (!category) throw new NotFoundException('This category is not found');
+
+    return await this.categoryRepository.delete(id);
   }
 }
